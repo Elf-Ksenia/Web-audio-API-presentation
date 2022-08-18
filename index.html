@@ -1,40 +1,299 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<link rel="stylesheet" href="dist/reset.css">
-		<link rel="stylesheet" href="dist/reveal.css">
-		<link rel="stylesheet" href="dist/theme/black.css">
+	<title>reveal.js</title>
 
-		<!-- Theme used for syntax highlighted code -->
-		<link rel="stylesheet" href="plugin/highlight/monokai.css">
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
-			</div>
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/black.css">
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section
+				data-background-image="https://i.pinimg.com/originals/a9/4a/ee/a94aee835e16cff4f14c83dac8ffbe10.gif">
+				<h2 class="r-fit-text">Web Audio API</h2>
+				<h2 class="fragment fade-up r-fit-text">an API that allows us to create and manage sounds in our browser
+				</h2>
+			</section>
+			<section>
+				<section>
+					<h2>How it works?</h2>
+				</section>
+				<section>
+					<p>The Web Audio API has a main audio context.</p>
+				</section>
+				<section>
+					<p>Inside that audio context, we can handle and manage our audio operations. The audio operations
+						are handled by audio nodes.</p>
+				</section>
+				<section>
+					<p>We can have a lot of different audio nodes inside the same audio context, allowing us to create
+						some nice things such as drum kits, synthesizers, etc.</p>
+				</section>
+			</section>
+			<section>
+				<section>
+					<p>You have several ways to obtain audio:</p>
+					<p class="fragment fade-up">
+						Sound can be generated directly in JavaScript by an audio node (such as an oscillator).</p>
+					<p class="fragment fade-up"> It can be created from raw PCM data (such as .WAV files or other
+						formats supported by
+					<pre class="fragment fade-up"><code data-trim data-noescape>decodeAudioData())</code></pre>
+					</p>
+					<p class="fragment fade-up"> It can be generated from HTML media elements, such as
+					<pre
+						class="fragment fade-up"><code data-trim data-noescape><script type="text/template"><video> or <audio></script></code></pre>
+					</p>
+					<p class="fragment fade-up">It can be obtained from a WebRTC MediaStream, such as a webcam or
+						microphone.
+					</p>
+				</section>
+				<section>
+					<h3><span style="color:rgb(50, 50, 219)">Audio data:</span> what's in a sample</h3>
+					<p class="fragment fade-up"> When an audio signal is processed, sampling happens.</p>
+					<p class="fragment fade-up">Sampling is the conversion of a continuous
+						signal to a discrete signal. </p>
+					<p class="fragment fade-up">Put another way, a continuous sound wave, such as a band playing live,
+						is converted into a sequence of digital samples (a discrete-time signal) that allows a computer
+						to
+						handle the audio in distinct blocks.
+					</p>
+				</section>
+				<section>
+					<h3>Audio buffers: frames, samples, and channels</h3>
+					<p class="fragment fade-up" style="color:rgb(50, 50, 219)">
+						An AudioBuffer is defined with three parameters:
+					</p>
+					<ul>
+						<li class="fragment fade-up">the number of channels (1 for mono, 2 for stereo, etc.), </li>
+						<li class="fragment fade-up">its length, meaning the number of sample frames inside the buffer,
+						</li>
+						<li class="fragment fade-up">the sample rate, the number of sample frames played per second.
+						</li>
+					</ul>
+				</section>
+				<section>
+					<p>
+						A sample is a single 32-bit floating point value representing the value of the audio stream at
+						each
+						specific moment in time within a particular channel (left or right, if in the case of stereo).
+					</p>
+					<p class="fragment fade-up">
+						A
+						frame,
+						or sample frame, is the set of all values for all channels that will play at a specific moment
+						in
+						time:
+						all the samples of all the channels that play at the same time (two for a stereo sound, six for
+						5.1,
+						etc.).
+					</p>
+					<p class="fragment fade-up">
+						The sample rate is the quantity of those samples (or frames, since all samples of a frame play
+						at
+						the
+						same time) that will play in one second, measured in Hz. The higher the sample rate, the better
+						the
+						sound quality.
+					</p>
+				</section>
+				<section>
+					<h3>Audio channels</h3>
+					<p class="fragment fade-up">
+						Each audio buffer may contain different numbers of channels.
+					</p>
+					<p class="fragment fade-up">Most modern audio devices use the
+						basic
+						mono (only one channel) and stereo (left and right channels) settings.
+					</p>
+					<p class="fragment fade-up"> Some more complex sets
+						support surround sound settings (like quad and 5.1), which can lead to a richer sound experience
+						thanks to their high channel count.
+					</p>
+				</section>
+			</section>
+			<section>
+				<section>
+					Let’s create our first audio context using the Web Audio API
+
+					<pre class="fragment fade-up"><code data-trim data-noescape>
+					const audioContext = new 
+					(window.AudioContext || window.webkitAudioContext);
+					  </code></pre>
+				</section>
+				<section>The audio context is an object that contains all stuff audio
+					related.</section>
+				<section>It’s not a good idea to have more than one audio context in your project—this can cause
+					you a lot of trouble in the future.</section>
+			</section>
+			<section>
+				<section>
+					<p>The Web Audio API has an interface called
+						<span style="color:rgb(50, 50, 219)">OscillatorNode.</span>
+					</p>
+					<p>
+						This interface represents a periodic
+						waveform, pretty much a sine wave.
+					</p>
+
+				</section>
+				<section>
+					Let’s use this interface to create some sound.
+					<pre class="fragment fade-up"><code data-trim data-noescape>
+						const mySound = audioContext.createOscillator()
+						  </code></pre>
+				</section>
+				<section>
+					We created our OscillatorNode, now we should start the mySound, like this:
+					<pre class="fragment fade-up"><code data-trim data-noescape>mySound.start()</code></pre>
+				</section>
+
+				<section>
+					<p class="fragment fade-in-then-out">
+						But, as you can see, it’s not playing anything in your browser.
+					</p>
+					<p class="fragment fade-in-then-out" style="color:rgb(50, 50, 219)"> Why?</p>
+					<p class="fragment fade-in-then-out">We
+						create our audioContext
+						const initiating the audio context, but we didn’t pass any destination to it.
+					</p>
+					<p class="fragment fade-up"> We should always pass
+						a
+						property called destination to our audioContext const, otherwise, it won’t work.</p>
+				</section>
+				<section>
+					So, now, just use the mySound const, call a method called connect and pass our
+					<p style="color:rgb(50, 50, 219)">audioContext.destination:</p>
+					<pre class="fragment fade-up"><code data-trim data-noescape>
+mySound.connect(audioContext.destination)</code></pre>
+				</section>
+			</section>
+			<section>
+				<section
+					data-background-image="https://img.freepik.com/premium-photo/sound-mixer-professional-audio-mixing-console-with-lights-buttons-faders-sliders_169016-14729.jpg?w=2000">
+					<h2>Properties</h2>
+				</section>
+				<section>
+					<p>
+						The OscillatorNode has some properties, such as <span
+							style="color:rgb(50, 50, 219)">type.</span>
+					</p>
+					<p class="fragment fade-up">
+						The type property specifies the type of
+						waveform that we want our OscillatorNode to output.
+					</p>
+				</section>
+				<section>
+					<p style="color:rgb(201, 5, 5)">We can use 5 forms of output: </p>
+					<p class="fragment fade-up">sine (default)</p>
+					<p class="fragment fade-up">square</p>
+					<p class="fragment fade-up">sawtooth</p>
+					<p class="fragment fade-up">triangle</p>
+					<p class="fragment fade-up">custom</p>
+				</section>
+				<section>
+					To change the type of our OscillatorNode, all we must do is pass after the <span
+						style="color:rgb(50, 50, 219)">start()</span> method a type to
+					our mySound, like this:
+					<pre class="fragment fade-up"><code data-trim data-noescape>
+						mySound.type = "square"
+					</code>
+				</section>
+			</section>
+			<section>
+				<section>
+			<p>The OscillatorNode also has another property called <span
+				style="color:rgb(50, 50, 219)">frequency.</span>
+			</p>
+				<p class="fragment fade-up">We can use this property to represent the oscillation of our OscillatorNode in hertz.</p>
+			</section>
+			<section>
+				<p>To change the oscillation of our OscillatorNode in hertz, we must call the frequency property, and call the setValueAtTime function. This function receives two arguments: the value in hertz and our audio context.</p>
+				<pre class="fragment fade-up"><code data-trim data-noescape>mySound.frequency.setValueAtTime
+					(400, audioContext.currentTime)</code></pre>
+				</section>
+				<section>
+					<p class="fragment fade-in-then-out">
+						By using the Web Audio API, we can manage audio pretty easily now in our browsers, but if you’re
+						wanting to use this API to create something more difficult and powerful, you’ll probably need to
+						use
+						a library for it.</p>
+					<p class="fragment fade-up">
+						To make things easier for us, we can use a JavaScript audio library for the job, and the
+						most-used
+						JavaScript audio library now is Howler. With this library we can create fancier examples and
+						make
+						use of the full powers of the Web Audio API.</p>
+				</section>
+			</section>
+			<section>
+				<section>
+					<img src="https://howlerjs.com/assets/images/twittercard.png" alt="" width="200"
+						class="fragment fade-in-then-out">
+					<h2>Howler</h2>
+					<p class="fragment fade-up">The <a href="https://github.com/goldfire/howler.js">Howler</a>
+						JavaScript audio library was created to help developers work
+						in a more reliable and
+						easier way with the Web Audio API, making work with audio easier and more fun.</p>
+				</section>
+				<section>
+					<p>Main Features:</p>
+
+					<p class="fragment fade-up r-fit-text"><span style="color:rgb(5, 118, 5)">Easy to learn </span>
+						—Howler is
+						very easy to learn and get started. It also has very
+						decent and well-explained documentation.</p>
+					<p class="fragment fade-up r-fit-text"><span style="color:rgb(5, 118, 5)">Support </span>— With
+						this library
+						you don’t have to worry if your code will run on older browsers. Since this library uses Web
+						Audio API by default and relies on HMTL5 Audio, your code will run in almost every browser, even
+						the older browsers like IE9.</p>
+					<p class="fragment fade-up r-fit-text"><span style="color:rgb(5, 118, 5)">Full
+							control</span>— You can
+						control basically everything, from the src of the audio to volume, seek, rate, autoplay, mute,
+						etc.</p>
+					<p class="fragment fade-up r-fit-text"><span style="color:rgb(5, 118, 5)">Zero
+							dependencies </span>— This
+						library does not have any plugin or dependency code, making the library lighter and less prone
+						to bugs or errors.</p>
+				</section>
+			</section>
+			<section data-background-image="https://cdn.dribbble.com/users/746306/screenshots/4639102/wave_sound.gif">
+				<h2>Conclusion</h2>
+				<p class="fragment fade-up">
+					Web Audio API opens a lot of possibilities for us to create more complex applications managing audio
+					on the
+					browsers, and we can apply and use this API in our applications to make them more interactive.
+				</p>
+			</section>
 		</div>
+	</div>
 
-		<script src="dist/reveal.js"></script>
-		<script src="plugin/notes/notes.js"></script>
-		<script src="plugin/markdown/markdown.js"></script>
-		<script src="plugin/highlight/highlight.js"></script>
-		<script>
-			// More info about initialization & config:
-			// - https://revealjs.com/initialization/
-			// - https://revealjs.com/config/
-			Reveal.initialize({
-				hash: true,
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
 
-				// Learn about plugins: https://revealjs.com/plugins/
-				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
-			});
-		</script>
-	</body>
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+		});
+	</script>
+
+</body>
+
 </html>
